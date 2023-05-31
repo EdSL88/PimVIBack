@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  pim_vi:
+    build: .
+    container_name: pim_vi
+    ports:
+      - 8777:8000

@@ -1,0 +1,58 @@
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  cpf       String?
+  rg        String?
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sales     Sale[]
+}
+
+model Sale {
+  id            String            @id @default(uuid())
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  userId        String
+  user          User?             @relation(fields: [userId], references: [id])
+  paymentMethod String
+  total         Float
+  productId     String[]
+  status        Boolean           @default(false)
+  products      ProductsOnSales[]
+}
+
+model ProductsOnSales {
+  productId String
+  saleId    String
+  product   Product @relation(fields: [productId], references: [id])
+  sale      Sale    @relation(fields: [saleId], references: [id])
+
+  @@id([productId, saleId])
+}
+
+model Product {
+  id           String            @id @default(uuid())
+  name         String
+  price        Float
+  createdAt    DateTime          @default(now())
+  image        String?
+  category     String?
+  manufacturer String?
+  description  String?
+  quantity     Int
+  updatedAt    DateTime          @updatedAt
+  sales        ProductsOnSales[]
+}
